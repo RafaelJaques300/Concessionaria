@@ -20,18 +20,22 @@ public class Veiculo {
     private String ano;
 
     @Column(unique = true)
-    private String preco;
+    private Double preco;
 
     @Column(unique = true)
     private String cor;
+
+    @Column(unique = true)
+    private String modelo;
 
     public Veiculo() {}
 
     public Veiculo(String marca, String ano, String preco, String cor) {
         this.marca = marca;
         this.ano = ano;
-        this.preco = preco;
+        this.preco = Double.valueOf(preco);
         this.cor = cor;
+        this.modelo = modelo;
     }
 
     public Veiculo(VeiculoDTO veiculoDTO){
@@ -40,6 +44,7 @@ public class Veiculo {
         this.ano = veiculoDTO.getAno();
         this.preco = veiculoDTO.getPreco();
         this.cor = veiculoDTO.getCor();
+        this.modelo = veiculoDTO.getModelo();
     }
 
     @Override

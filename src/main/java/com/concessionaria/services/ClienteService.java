@@ -23,12 +23,12 @@ public class ClienteService {
 
     private Cliente converterClienteDTOParaCliente(ClienteDTO clienteDTO) {
         Cliente cliente = new Cliente();
-        clienteDTO.setId(clienteDTO.getId());
-        clienteDTO.setNome(clienteDTO.getNome());
-        clienteDTO.setCpf(clienteDTO.getCpf());
-        clienteDTO.setEndereco(clienteDTO.getEndereco());
-        clienteDTO.setTelefone(clienteDTO.getTelefone());
-        clienteDTO.setEmail(clienteDTO.getEmail());
+
+        cliente.setNome(clienteDTO.getNome());
+        cliente.setCpf(clienteDTO.getCpf());
+        cliente.setEndereco(clienteDTO.getEndereco());
+        cliente.setTelefone(clienteDTO.getTelefone());
+        cliente.setEmail(clienteDTO.getEmail());
         return cliente;
     }
 
@@ -45,34 +45,43 @@ public class ClienteService {
 
 
     public Cliente buscarClientePorId(Long id) {
-        return clienteRepository.findById(id) .orElseThrow(() ->
+        return clienteRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("Cliente não encontrado"));
     }
 
     public ClienteDTO buscarClientePorEmail(String email) {
-        return converterClienteParaClienteDTO(clienteRepository.findByEmail(email) .orElseThrow(() ->
+        return converterClienteParaClienteDTO(clienteRepository.findByEmail(email).orElseThrow(() ->
                 new IllegalArgumentException("Cliente não encontrado")));
     }
 
     public ClienteDTO atualizarCliente(ClienteDTO clienteDTO) {
         if (isNull(clienteDTO.getId())) {
             throw new IllegalArgumentException("Cliente não encontrado");
+        }
 
+        // Busca o cliente no banco
+        Cliente cliente = clienteRepository.findById(clienteDTO.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
+
+        // Atualiza apenas os campos necessários
+        cliente.setNome(clienteDTO.getNome());
+        cliente.setCpf(clienteDTO.getCpf());
+        cliente.setEndereco(clienteDTO.getEndereco());
+        cliente.setTelefone(clienteDTO.getTelefone());
+        cliente.setEmail(clienteDTO.getEmail());
+
+        // Salva só UMA vez
+        Cliente atualizado = clienteRepository.save(cliente);
+
+        return converterClienteParaClienteDTO(atualizado);
     }
 
-    Cliente cliente = clienteRepository.findById(clienteDTO.getId()).orElseThrow(() ->
-            new IllegalArgumentException("Cliente não encontrado"));
-
-        Cliente clienteAtualizado = converterClienteDTOParaCliente(clienteDTO);
-        clienteRepository.save(clienteAtualizado);
-
-        cliente = converterClienteDTOParaCliente(clienteDTO);
-        cliente = clienteRepository.save(cliente);
-
-        return converterClienteParaClienteDTO(cliente);
-    }
 
     public void deletarCliente(Long id) {
         clienteRepository.deleteById(id);
+    }
+
+    public Cliente save(Cliente cliente) {
+        return clienteRepository.save(cliente);
     }
 }

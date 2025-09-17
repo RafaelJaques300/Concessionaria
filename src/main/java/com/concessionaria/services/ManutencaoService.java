@@ -5,6 +5,9 @@ import com.concessionaria.models.Manutencao;
 import com.concessionaria.repositories.ManutencaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
 
 import static java.util.Objects.isNull;
 
@@ -15,6 +18,10 @@ public class ManutencaoService {
     private ManutencaoRepository manutencaoRepository;
     private Manutencao manutencaoDTO;
 
+    public List<Manutencao> buscarTodosManutencao() {
+        return manutencaoRepository.findAll().stream().toList();
+    }
+
     public ManutencaoDTO salvarManutencao(ManutencaoDTO manutencaoDTO) {
         Manutencao manutencao = converterManutencaoDTOParaManutencao(manutencaoDTO);
         manutencao = manutencaoRepository.save(manutencao);
@@ -23,11 +30,11 @@ public class ManutencaoService {
 
     private Manutencao converterManutencaoDTOParaManutencao(ManutencaoDTO manutencaoDTO) {
         Manutencao manutencao = new Manutencao();
-        manutencaoDTO.setId(manutencaoDTO.getId());
-        manutencaoDTO.setTipoManutencao(manutencaoDTO.getTipoManutencao());
-        manutencaoDTO.setDataManutencao(manutencaoDTO.getDataManutencao());
-        manutencaoDTO.setStatus(manutencaoDTO.getStatus());
-        manutencaoDTO.setCusto(manutencaoDTO.getCusto());
+        manutencao.setId(manutencaoDTO.getId());
+        manutencao.setTipoManutencao(manutencaoDTO.getTipoManutencao());
+        manutencao.setDataManutencao(manutencaoDTO.getDataManutencao());
+        manutencao.setStatus(manutencaoDTO.getStatus());
+        manutencao.setCusto(manutencaoDTO.getCusto());
         return manutencao;
     }
 
@@ -51,13 +58,13 @@ public class ManutencaoService {
                 new IllegalArgumentException("Manutencao não encontrado")));
     }
 
-    public ManutencaoDTO atualizarManutencao(ManutencaoDTO manutencaoDTO) {
-        if (isNull(manutencaoDTO.getId())) {
-            throw new IllegalArgumentException("Manutencao não encontrado");
-        }
+    public ManutencaoDTO atualizarManutencao( ManutencaoDTO manutencaoDTO) {
+       // if (isNull(manutencaoDTO.getId())) {
+        //    throw new IllegalArgumentException("Manutencao não encontrado sem id");
+       // }
 
         Manutencao manutencao = manutencaoRepository.findById(manutencaoDTO.getId()).orElseThrow(() ->
-                new IllegalArgumentException("Manutencao não encontrado"));
+                new IllegalArgumentException("Manutencao não encontrado sei la oque"));
 
         Manutencao manutencaoAtualizado = converterManutencaoDTOParaManutencao(manutencaoDTO);
         manutencaoRepository.save(manutencaoAtualizado);

@@ -2,18 +2,32 @@ package com.concessionaria.resourcers;
 
 import com.concessionaria.dtos.ClienteDTO;
 import com.concessionaria.models.Cliente;
+import com.concessionaria.repositories.ClienteRepository;
 import com.concessionaria.services.ClienteService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Scanner;
+
+@CrossOrigin(origins = "http://127.0.0.1:5500")
 @RestController
 @RequestMapping("/api/cliente")
 public class ClienteResource {
+
+    @Autowired
+    private ClienteRepository clienteRepository;
 
     private final ClienteService clienteService;
 
     public ClienteResource(ClienteService clienteService) {
         this.clienteService = clienteService;
+    }
+    @GetMapping
+    public List<Cliente> listarTodos() {
+
+        return clienteRepository.findAll();
     }
 
     @GetMapping("/")
@@ -28,19 +42,32 @@ public class ClienteResource {
         return ResponseEntity.ok(clienteDTO);
     }
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<ClienteDTO> criarCliente(@RequestBody ClienteDTO clienteDTO) {
+        System.out.println("Entrou no post");
+        System.out.println(clienteDTO.getNome());
+        System.out.println(clienteDTO.getCpf());
+        System.out.println(clienteDTO.getEmail());
+        System.out.println(clienteDTO.getEndereco());
+        System.out.println(clienteDTO.getTelefone());
         return ResponseEntity.ok(clienteService.salvarCliente(clienteDTO));
     }
 
-    @PutMapping()
-    public ResponseEntity<ClienteDTO> atualizarCliente(ClienteDTO clienteDTO){
-        return ResponseEntity.ok(clienteService.atualizarCliente(clienteDTO));
+    @PutMapping("/{id}")
+    public ResponseEntity<ClienteDTO> atualizarCliente(
+            @PathVariable Long id,
+            @RequestBody ClienteDTO clienteDTO) {
+
+        clienteDTO.setId(id);
+
+        ClienteDTO atualizado = clienteService.atualizarCliente(clienteDTO);
+        return ResponseEntity.ok(atualizado);
     }
 
-    @DeleteMapping()
-    public ResponseEntity<Void> deletarCliente(@RequestBody ClienteDTO clienteDTO){
-        clienteService.deletarCliente(clienteDTO.getId());
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarCliente(@PathVariable Long id) {
+        clienteService.deletarCliente(id);
         return ResponseEntity.noContent().build();
     }
 }
+

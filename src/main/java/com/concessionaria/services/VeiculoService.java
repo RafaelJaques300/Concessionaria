@@ -6,6 +6,8 @@ import com.concessionaria.repositories.VeiculoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import static java.util.Objects.isNull;
 
 @Service
@@ -13,7 +15,6 @@ public class VeiculoService {
 
     @Autowired
     private VeiculoRepository veiculoRepository;
-    private Veiculo veiculoDTO;
 
     public VeiculoDTO salvarVeiculo(VeiculoDTO veiculoDTO) {
         Veiculo veiculo = converterVeiculoDTOParaVeiculo(veiculoDTO);
@@ -23,11 +24,12 @@ public class VeiculoService {
 
     private Veiculo converterVeiculoDTOParaVeiculo(VeiculoDTO veiculoDTO) {
         Veiculo veiculo = new Veiculo();
-        veiculoDTO.setId(veiculoDTO.getId());
-        veiculoDTO.setMarca(veiculoDTO.getMarca());
-        veiculoDTO.setAno(veiculoDTO.getAno());
-        veiculoDTO.setPreco(veiculoDTO.getPreco());
-        veiculoDTO.setCor(veiculoDTO.getCor());
+        veiculo.setId(veiculoDTO.getId());
+        veiculo.setMarca(veiculoDTO.getMarca());
+        veiculo.setAno(veiculoDTO.getAno());
+        veiculo.setPreco(veiculoDTO.getPreco());
+        veiculo.setCor(veiculoDTO.getCor());
+        veiculo.setModelo(veiculoDTO.getModelo());
         return veiculo;
     }
 
@@ -36,8 +38,9 @@ public class VeiculoService {
         veiculoDTO.setId(veiculo.getId());
         veiculoDTO.setMarca(veiculo.getMarca());
         veiculoDTO.setAno(veiculo.getAno());
-        veiculoDTO.setPreco(veiculo.getPreco());
+        veiculoDTO.setPreco(Double.valueOf(veiculo.getPreco()));
         veiculoDTO.setCor(veiculo.getCor());
+        veiculoDTO.setModelo(veiculo.getModelo());
         return veiculoDTO;
     }
 
@@ -47,8 +50,10 @@ public class VeiculoService {
     }
 
     public VeiculoDTO buscarVeiculoPorAno(String ano) {
-        return converterVeiculoParaVeiculoDTO(veiculoRepository.findByAno(ano).orElseThrow(() ->
-                new IllegalArgumentException("Veiculo não encontrado")));
+        return converterVeiculoParaVeiculoDTO(
+                veiculoRepository.findByAno(ano).orElseThrow(() ->
+                        new IllegalArgumentException("Veiculo não encontrado"))
+        );
     }
 
     public VeiculoDTO atualizarVeiculo(VeiculoDTO veiculoDTO) {
@@ -56,19 +61,30 @@ public class VeiculoService {
             throw new IllegalArgumentException("Veiculo não encontrado");
         }
 
-        Veiculo veiculo = veiculoRepository.findById(veiculoDTO.getId()).orElseThrow(() ->
-                new IllegalArgumentException("Veiculo não encontrado"));
+        Veiculo veiculoExistente = veiculoRepository.findById(veiculoDTO.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Veiculo não encontrado"));
 
-        Veiculo veiculoAtualizado = converterVeiculoDTOParaVeiculo(veiculoDTO);
-        veiculoRepository.save(veiculoAtualizado);
+        // atualiza os campos
+        veiculoExistente.setMarca(veiculoDTO.getMarca());
+        veiculoExistente.setAno(veiculoDTO.getAno());
+        veiculoExistente.setPreco(veiculoDTO.getPreco());
+        veiculoExistente.setCor(veiculoDTO.getCor());
+        veiculoExistente.setModelo(veiculoDTO.getModelo());
 
-        veiculo = converterVeiculoDTOParaVeiculo(veiculoDTO);
-        veiculo = veiculoRepository.save(veiculo);
+        // salva apenas uma vez
+        Veiculo veiculoAtualizado = veiculoRepository.save(veiculoExistente);
 
-        return converterVeiculoParaVeiculoDTO(veiculo);
+        return converterVeiculoParaVeiculoDTO(veiculoAtualizado);
     }
 
     public void deletarVeiculo(Long id) {
         veiculoRepository.deleteById(id);
+    }
+
+    public List<VeiculoDTO> buscarTodosVeiculo() {
+        return veiculoRepository.findAll()
+                .stream()
+                .map(this::converterVeiculoParaVeiculoDTO)
+                .toList();
     }
 }

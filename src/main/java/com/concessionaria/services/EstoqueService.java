@@ -5,7 +5,9 @@ import com.concessionaria.models.Estoque;
 import com.concessionaria.repositories.EstoqueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
- 
+
+import java.util.List;
+
 @Service
 public class EstoqueService {
 
@@ -21,8 +23,8 @@ public class EstoqueService {
 
     private Estoque converterEstoqueDTOParaEstoque(EstoqueDTO estoqueDTO) {
         Estoque estoque = new Estoque();
-        estoqueDTO.setId(estoqueDTO.getId());
-        estoqueDTO.setQuantidadeDisponivel(estoqueDTO.getQuantidadeDisponivel());
+        estoque.setId(estoqueDTO.getId());
+        estoque.setQuantidadeDisponivel(estoqueDTO.getQuantidadeDisponivel());
         return estoque;
     }
 
@@ -61,4 +63,8 @@ public class EstoqueService {
         estoqueRepository.deleteById(id);
     }
 
+    public List<EstoqueDTO> buscarTodosEstoque() {
+        return estoqueRepository.findAll().stream().map(estoque -> converterEstoqueParaEstoqueDTO(estoque)).toList();
+
+    }
 }

@@ -6,6 +6,9 @@ import com.concessionaria.services.EstoqueService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
+@CrossOrigin(origins = "http://localhost:5500/")
 @RestController
 @RequestMapping("/api/estoque")
 public class EstoqueResource {
@@ -31,6 +34,12 @@ public class EstoqueResource {
     @PostMapping()
     public ResponseEntity<EstoqueDTO> criarEstoque(@RequestBody EstoqueDTO estoqueDTO) {
         return ResponseEntity.ok(estoqueService.salvarEstoque(estoqueDTO));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<EstoqueDTO>> buscarTodosEstoque() {
+        List<EstoqueDTO> estoqueDTOList = estoqueService.buscarTodosEstoque();
+        return ResponseEntity.ok(estoqueDTOList);
     }
 
     @PutMapping()
